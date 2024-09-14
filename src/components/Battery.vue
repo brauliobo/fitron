@@ -19,8 +19,8 @@ export default {
   watch: {
     device: {
       immediate: true,
-      async handler() {
-        this.batteryLevel = await this.device.getBatteryLevel()
+      handler() {
+        this.device.observeBatteryLevel().subscribe(bl => this.batteryLevel = bl)
       }
     }
   },
