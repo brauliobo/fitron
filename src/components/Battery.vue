@@ -1,7 +1,7 @@
 <template>
   <div>
-    <p v-if=heartRate >Heart Rate: {{ heartRate }} BPM</p>
-    <p v-else >No heart rate data available</p>
+    <p v-if=batteryLevel >Battery: {{ batteryLevel }} %</p>
+    <p v-else >No battery level available</p>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import log from '@/log'
 export default {
   data() {
     return {
-      heartRate: null
+      batteryLevel: null
     }
   },
   props: ['device'],
@@ -19,8 +19,8 @@ export default {
   watch: {
     device: {
       immediate: true,
-      handler() {
-        this.device.observeHeartRate().subscribe(hr => this.heartRate = hr)
+      async handler() {
+        this.batteryLevel = await this.device.getBatteryLevel()
       }
     }
   },

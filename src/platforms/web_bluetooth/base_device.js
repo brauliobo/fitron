@@ -6,28 +6,36 @@ export default class BaseDevice {
     this.connection = connection
   }
 
-  serviceHeartRate() {
+  async getBatteryLevel() {
+    const charac = await this.fetchCharac('battery_service', 'battery_level')
+    const bl   = await charac.readValue()
+    return bl.getUint8(0)
+  }
+
+  observeHeartRate() {
     return this.watchNotifications('heart_rate', 'heart_rate_measurement', (sub, event) => {
-      const value     = event.target.value
-      const heartRate = value.getUint8(1)
-      sub.next(heartRate)
+      sub.next(event.target.value.getUint8(1))
     })
   }
 
   watchNotifications(service, characteristic, handler) {
     return new Observable(async sub => {
-      service        = await this.connection.getPrimaryService(service)
-      characteristic = await service.getCharacteristic(characteristic)
+      const charac = await this.fetchCharac(service, characteristic)
 
-      await characteristic.startNotifications()
+      await charac.startNotifications()
       function handleNotifications(event) { handler(sub, event) }
-      characteristic.addEventListener('characteristicvaluechanged', handleNotifications)
+      charac.addEventListener('characteristicvaluechanged', handleNotifications)
 
       return () => {
-        characteristic.stopNotifications()
-        characteristic.removeEventListener('characteristicvaluechanged', handleNotifications)
+        charac.stopNotifications()
+        charac.removeEventListener('characteristicvaluechanged', handleNotifications)
       }
     })
+  }
+
+  async fetchCharac(service, characteristic) {
+    service = await this.connection.getPrimaryService(service)
+    return await service.getCharacteristic(characteristic)
   }
 
 }

@@ -2,6 +2,7 @@
   <div id=app >
     <button @click=pair >Pair & Connect</button>
 
+    <Battery v-if=device :device=device />
     <HeartRateMonitor v-if=device :device=device />
 
   </div>
@@ -9,6 +10,7 @@
 
 <script>
 import log from '@/log.js'
+import Battery from '../components/Battery.vue'
 import HeartRateMonitor from '../components/HeartRateMonitor.vue'
 import {PairService, ConnectService} from '../web_bluetooth.js'
 
@@ -20,7 +22,7 @@ export default {
     }
   },
   name: 'WebApp',
-  components: { Bluetooth, HeartRateMonitor },
+  components: { Battery, HeartRateMonitor },
 
   async mounted() {
   },
