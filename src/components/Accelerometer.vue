@@ -1,7 +1,7 @@
 <template>
   <div>
-    <p v-if=batteryLevel >Battery: {{ batteryLevel }} %</p>
-    <p v-else >No battery level available</p>
+    Accelerometer
+    <p v-for='acc in accData' > {{ acc }} %</p>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import log from '@/log'
 export default {
   data() {
     return {
-      batteryLevel: null,
+      accData: [],
     }
   },
   props: ['device'],
@@ -20,7 +20,7 @@ export default {
     device: {
       immediate: true,
       handler() {
-        this.device.observeBatteryLevel().subscribe(bl => this.batteryLevel = bl)
+        this.device.observeAccelerometer().subscribe(acc => this.accData.push(acc))
       }
     }
   },

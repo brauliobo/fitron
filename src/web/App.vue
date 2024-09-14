@@ -4,6 +4,8 @@
 
     <Battery v-if=device :device=device />
     <HeartRateMonitor v-if=device :device=device />
+    <Ecg v-if=device :device=device />
+    <Accelerometer v-if=device :device=device />
 
   </div>
 </template>
@@ -12,6 +14,8 @@
 import log from '@/log.js'
 import Battery from '../components/Battery.vue'
 import HeartRateMonitor from '../components/HeartRateMonitor.vue'
+import Ecg from '../components/Ecg.vue'
+import Accelerometer from '../components/Accelerometer.vue'
 import {PairService, ConnectService} from '../web_bluetooth.js'
 
 export default {
@@ -22,7 +26,7 @@ export default {
     }
   },
   name: 'WebApp',
-  components: { Battery, HeartRateMonitor },
+  components: { Battery, HeartRateMonitor, Ecg, Accelerometer },
 
   async mounted() {
   },
