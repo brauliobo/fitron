@@ -41,10 +41,12 @@ export default class H10 extends BaseDevice {
   ]
 
   observeEcg() {
-    return this.observeNotifications(PMD_SERVICE, PMD_DATA, {
-      init: async (svc, _charac) => {
-        let charac = await svc.getCharacteristic(PMD_CONTROL)
+    return this.observes.ecg ||= this.observeNotifications(PMD_SERVICE, PMD_DATA, {
+      init: async () => {
+        let charac = await this.fetchCharac(PMD_SERVICE, PMD_CONTROL)
+        let unlock = await this.mutex.lock()
         await charac.writeValue(ECG_START)
+        unlock()
       },
       handler: (sub, event) => {
         const data = event.target.value;
@@ -54,7 +56,6 @@ export default class H10 extends BaseDevice {
         if (dataType === 0) { // ECG data type
           // Extract timestamp (bytes 1-8)
           const timestamp = dataView.getBigUint64(1, true);
-          console.log('ECG Timestamp:', timestamp.toString());
 
           // Extract ECG samples starting from byte 10
           const samples = [];
@@ -66,7 +67,6 @@ export default class H10 extends BaseDevice {
             const sampleValue = this.wordToSignedInt16LE(sampleBytes)
             samples.push(sampleValue)
           }
-          console.log('ECG Samples:', samples)
           sub.next(samples)
         }
       },
@@ -74,11 +74,13 @@ export default class H10 extends BaseDevice {
   }
 
   observeAccelerometer() {
-    return this.observeNotifications(PMD_SERVICE, PMD_DATA, {
-      init: async (svc, _charac) => {
-        let charac      = await svc.getCharacteristic(PMD_CONTROL)
-        let BytesToSend = [0x02, 2].concat(ACC_START)
-        await charac.writeValue(new Uint8Array(BytesToSend))
+    return this.observes.acc ||= this.observeNotifications(PMD_SERVICE, PMD_DATA, {
+      init: async () => {
+        let charac = await this.fetchCharac(PMD_SERVICE, PMD_CONTROL)
+        let unlock = await this.mutex.lock()
+        let init   = [0x02, 2].concat(ACC_START)
+        await charac.writeValue(new Uint8Array(init))
+        unlock()
       },
       handler: (sub, event) => {
         var dataTime = Date.now();

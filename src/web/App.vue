@@ -8,7 +8,7 @@
 
     <Battery v-if=device :device=device />
     <HeartRateMonitor v-if=device :device=device />
-    <//Ecg v-if=device :device=device />
+    <Ecg v-if=device :device=device />
     <Accelerometer v-if=device :device=device />
 
   </div>

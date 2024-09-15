@@ -3,11 +3,16 @@ import { interval } from 'rxjs'
 import { switchMap, startWith } from 'rxjs/operators'
 
 import log from '@/log'
+import Mutex from './mutex'
 
 export default class BaseDevice {
 
   constructor(connection) {
     this.connection = connection
+    this.services   = {}
+    this.characs    = {}
+    this.observes   = {}
+    this.mutex      = new Mutex
   }
 
   name() {
@@ -36,7 +41,7 @@ export default class BaseDevice {
   }
 
   observeHeartRate() {
-    return this.observeNotifications('heart_rate', 'heart_rate_measurement', {
+    return this.observes.hrm ||= this.observeNotifications('heart_rate', 'heart_rate_measurement', {
       handler: (sub, event) => {
         sub.next(event.target.value.getUint8(1))
       }
@@ -45,25 +50,27 @@ export default class BaseDevice {
 
   observeNotifications(service, charac, {handler, init}) {
     return new Observable(async sub => {
-      if (typeof(service) == 'string') service = await this.connection.getPrimaryService(service)
-      if (typeof(charac)  == 'string') charac  = await service.getCharacteristic(charac)
+      charac = await this.fetchCharac(service, charac)
 
-      if (init) await init(service, charac)
+      if (init) await init()
 
       await charac.startNotifications()
       function handleNotifications(event) { handler(sub, event) }
       charac.addEventListener('characteristicvaluechanged', handleNotifications)
 
       return () => {
-        charac.stopNotifications()
+        if (charac.isNotifying) charac.stopNotifications()
         charac.removeEventListener('characteristicvaluechanged', handleNotifications)
       }
     })
   }
 
-  async fetchCharac(service, characteristic) {
-    service = await this.connection.getPrimaryService(service)
-    return await service.getCharacteristic(characteristic)
+  async fetchService(service) {
+    return this.services[service] ||= await this.connection.getPrimaryService(service)
+  }
+
+  async fetchCharac(service, charac) {
+    return this.characs[charac] ||= await (await this.fetchService(service)).getCharacteristic(charac)
   }
 
 }
