@@ -1,10 +1,14 @@
 <template>
   <div id=app >
-    <button @click=pair >Pair & Connect</button>
+    <button v-if=!device @click=pair >Pair & Connect</button>
+    <div v-else >
+      Connected to {{device.name()}}
+      <button @click=disconnect >Disconnect</button>
+    </div>
 
     <Battery v-if=device :device=device />
     <HeartRateMonitor v-if=device :device=device />
-    <Ecg v-if=device :device=device />
+    <//Ecg v-if=device :device=device />
     <Accelerometer v-if=device :device=device />
 
   </div>
@@ -41,7 +45,14 @@ export default {
     async connect() {
       this.device = await (new ConnectService).connect(this.pairedDevice)
       log.debug('App: got device', this.device)
+      this.device.onDisconnect(_ => this.device = null)
     },
+
+    disconnect() {
+      this.device.disconnect()
+    },
+
+    
   }
 }
 </script>

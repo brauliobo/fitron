@@ -10,6 +10,18 @@ export default class BaseDevice {
     this.connection = connection
   }
 
+  name() {
+    return this.connection.device.name
+  }
+
+  disconnect() {
+    this.connection.disconnect()
+  }
+
+  onDisconnect(handler) {
+    this.connection.device.addEventListener('gattserverdisconnected', handler)
+  }
+
   async getBatteryLevel() {
     const charac = await this.fetchCharac('battery_service', 'battery_level')
     const bl     = await charac.readValue()
