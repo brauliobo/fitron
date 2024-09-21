@@ -48,6 +48,33 @@ export default class BaseDevice {
     })
   }
 
+  observeRRInterval() {
+    return this.observes.rri ||= this.observeNotifications('heart_rate', 'heart_rate_measurement', {
+      handler: (sub, event) => {
+        const value = event.target.value
+        let offset  = 0
+        const flags = value.getUint8(offset++)
+
+        const hrFormatUint16       =  flags & 0x01
+        const sensorContactStatus  = (flags & 0x06) >> 1
+        const energyExpendedStatus = (flags & 0x08) >> 3
+        const rrIntervalPresent    = (flags & 0x10) >> 4
+
+        offset += (hrFormatUint16) ? 2 : 1
+
+        let rrInterval = null
+        if (rrIntervalPresent) {
+          const rr = value.getUint16(offset, /* littleEndian= */ true)
+          rrInterval = rr // in units of 1/1024 seconds
+          rrInterval = rrInterval * 1000 / 1024 // Convert to milliseconds
+          offset += 2
+        }
+
+        sub.next(rrInterval)
+      }
+    })
+  }
+
   observeNotifications(service, charac, {handler, init}) {
     return new Observable(async sub => {
       charac = await this.fetchCharac(service, charac)
