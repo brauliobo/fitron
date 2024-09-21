@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import SdnnCalculator from '../services/SDDNCalculator.js';
+import SdnnCalculator from '../services/SDNNCalculator.js';
 
 export default {
   data() {
@@ -19,40 +19,34 @@ export default {
     };
   },
   props: ['device'],
+
   watch: {
     device: {
       immediate: true,
       handler(newDevice) {
-        // Clean up the old SDNN calculator and subscription
-        if (this.sdnnCalculator) {
-          this.sdnnCalculator.destroy();
-          this.sdnnCalculator = null;
-        }
-        if (this.sdnnSubscription) {
-          this.sdnnSubscription.unsubscribe();
-          this.sdnnSubscription = null;
-        }
-
+        this.init()
         if (newDevice) {
-          // Create a new SDNN calculator instance
-          this.sdnnCalculator = new SdnnCalculator(newDevice, 60);
+          this.sdnnCalculator = new SdnnCalculator(newDevice, 60)
 
           // Subscribe to the SDNN value
           this.sdnnSubscription = this.sdnnCalculator.getSdnnObservable().subscribe(sdnn => {
             this.sdnnValue = sdnn;
             this.rrIntervalCount = this.sdnnCalculator.rrIntervals.length;
-          });
+          })
         }
       },
     },
   },
+
+  methods: {
+    init() {
+      this.sdnnCalculator   && (this.sdnnCalculator.destroy(), this.sdnnCalculator = null)
+      this.sdnnSubscription && (this.sdnnSubscription.unsubscribe(), this.sdnnSubscription = null)
+    }
+  },
+
   beforeDestroy() {
-    if (this.sdnnCalculator) {
-      this.sdnnCalculator.destroy();
-    }
-    if (this.sdnnSubscription) {
-      this.sdnnSubscription.unsubscribe();
-    }
+    this.init()
   },
 };
 </script>

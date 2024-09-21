@@ -1,16 +1,19 @@
 // SdnnCalculator.js
 
 import { Subject } from 'rxjs';
+import { mean, std } from 'mathjs'; // Optional: Use mathjs for calculations
 
 export default class SdnnCalculator {
   /**
    * Constructs the SdnnCalculator.
    * @param {Object} device - The device providing R-R intervals.
    * @param {number} [maxRRIntervals=60] - Maximum number of R-R intervals to store.
+   * @param {number} [minRRIntervals=2] - Minimum number of R-R intervals required to calculate SDNN.
    */
-  constructor(device, maxRRIntervals = 60) {
+  constructor(device, maxRRIntervals = 60, minRRIntervals = 2) {
     this.device = device;
     this.maxRRIntervals = maxRRIntervals;
+    this.minRRIntervals = minRRIntervals;
 
     this.subscription = null;
     this.rrIntervals = []; // Store R-R intervals in milliseconds
@@ -72,16 +75,13 @@ export default class SdnnCalculator {
 
   /**
    * Calculates SDNN from the current buffer of R-R intervals.
+   * Allows calculation with a minimum number of intervals.
    */
   calculateSdnn() {
-    if (this.rrIntervals.length >= 10) { // Minimum number of intervals for reliable SDNN
-      const mean =
-        this.rrIntervals.reduce((acc, val) => acc + val, 0) /
-        this.rrIntervals.length;
-      const squaredDiffs = this.rrIntervals.map((val) => Math.pow(val - mean, 2));
-      const variance =
-        squaredDiffs.reduce((acc, val) => acc + val, 0) / this.rrIntervals.length;
-      this.sdnnValue = Math.sqrt(variance);
+    if (this.rrIntervals.length >= this.minRRIntervals) {
+      const meanRR = mean(this.rrIntervals);
+      const sdnn = std(this.rrIntervals, 'uncorrected'); // 'uncorrected' for population SD
+      this.sdnnValue = sdnn;
 
       // Emit the updated SDNN value
       this.sdnnSubject.next(this.sdnnValue);
@@ -105,10 +105,10 @@ export default class SdnnCalculator {
    */
   destroy() {
     if (this.subscription) {
-      this.subscription.unsubscribe();
+      this.subscription.unsubscribe(); // Clean up internal subscription
       this.subscription = null;
     }
-    this.sdnnSubject.complete();
+    this.sdnnSubject.complete(); // Complete the observable
   }
 }
 
