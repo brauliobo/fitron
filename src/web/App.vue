@@ -6,19 +6,22 @@
       <button @click=disconnect >Disconnect</button>
     </div>
 
-    <Battery v-if=device :device=device />
-    <HeartRateMonitor v-if=device :device=device />
-    <RRInterval v-if=device :device=device />
+    <div v-if=device>
+      <Battery :device=device />
+      <HeartRateMonitor :device=device />
+      <RRInterval :device=device />
 
-    <SDNN v-if=device :device=device />
-    <RMSSD v-if=device :device=device />
-    <pNN50 v-if=device :device=device />
-    <MxDMn v-if=device :device=device />
+      <SDNN :device=device />
+      <RMSSD :device=device />
+      <pNN50 :device=device />
+      <MxDMn :device=device />
+      <AMo50 :device=device />
 
-    <HeartRateChart v-if=device :device=device />
+      <HeartRateChart :device=device />
 
-    <Ecg v-if=device :device=device />
-    <Accelerometer v-if=device :device=device />
+      <Ecg :device=device />
+      <Accelerometer :device=device />
+    </div>
 
   </div>
 </template>
