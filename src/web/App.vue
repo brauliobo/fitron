@@ -13,6 +13,7 @@
     <SDNN v-if=device :device=device />
     <RMSSD v-if=device :device=device />
     <pNN50 v-if=device :device=device />
+    <MxDMn v-if=device :device=device />
 
     <HeartRateChart v-if=device :device=device />
 
