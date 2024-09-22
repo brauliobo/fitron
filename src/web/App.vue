@@ -16,6 +16,7 @@
       <pNN50 :device=device />
       <MxDMn :device=device />
       <AMo50 :device=device />
+      <CV :device=device />
 
       <HeartRateChart :device=device />
 
