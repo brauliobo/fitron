@@ -7,7 +7,7 @@
 
 <script>
 import log from '@/log'
-import Plotly from 'plotly.js-dist'
+import Plotly from 'plotly.js-dist-min'
 
 export default {
   data() {
