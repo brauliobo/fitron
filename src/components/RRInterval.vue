@@ -18,7 +18,7 @@ export default {
   data() {
     return {
       lastRRInterval: null,
-      opts: opts,
+      opts, opts,
     }
   },
   props: ['device'],

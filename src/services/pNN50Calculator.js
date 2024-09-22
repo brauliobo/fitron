@@ -6,9 +6,8 @@ export default class Pnn50Calculator extends RRIntCalculator {
   }
 
   calculateMetric() {
-    if (this.data.length >= 2) {
-      const n = Math.min(this.pulsesNumber, this.data.length)
-      const recentRrs = this.data.slice(-n)
+    const recentRrs = this.recentRrs
+    if (recentRrs.length >= 2) {
       const differences = recentRrs.slice(1).map((val, i) => Math.abs(val - recentRrs[i]))
       const count = differences.filter(diff => diff > 50).length
       const pnn50 = (count / differences.length) * 100

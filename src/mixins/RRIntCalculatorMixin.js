@@ -1,10 +1,12 @@
+import { opts } from '../services/store'
+
 export default {
   data() {
     return {
-      calculator: null,
+      opts:  opts,
       value: 0,
+      calculator:   null,
       subscription: null,
-      opts: this.opts, // Assumes 'opts' is defined in the component's data
     }
   },
   props: ['device'],
@@ -15,7 +17,10 @@ export default {
         this.reset()
         if (newDevice && this.calculatorClass) {
           this.calculator = new this.calculatorClass(newDevice, this.opts)
-          this.subscription = this.calculator.getMetricObservable().subscribe(metric => this.value = metric)
+          this.subscription = this.calculator.getMetricObservable().subscribe(metric => {
+            this.value = metric
+            this.addMetricValue(metric) // for MetricHistoryMixin
+          })
         }
       },
     },

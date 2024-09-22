@@ -1,19 +1,20 @@
 <template>
   <div>
-    <p><b>SDNN:</b> {{ value.toFixed(2) }} ms</p>
+    <p>
+      <b>SDNN:</b>
+      {{ value.toFixed(2) }}ms - Mean: {{meanValue.toFixed(2)}}ms
+    </p>
   </div>
 </template>
 
 <script>
-import { opts } from '../services/store'
 import SdnnCalculator from '../services/SDNNCalculator.js'
-import RRIntCalculatorMixin from '../mixins/RRIntCalculatorMixin.js'
+import MetricMixin from '../mixins/MetricMixin.js'
 
 export default {
-  mixins: [RRIntCalculatorMixin],
+  mixins: [MetricMixin],
   data() {
     return {
-      opts: opts,
       calculatorClass: SdnnCalculator
     }
   }

@@ -7,9 +7,8 @@ export default class SdnnCalculator extends RRIntCalculator {
   }
 
   calculateMetric() {
-    if (this.data.length >= 2) {
-      const n = Math.min(this.pulsesNumber, this.data.length)
-      const recentRrs = this.data.slice(-n)
+    const recentRrs = this.recentRrs
+    if (recentRrs.length >= 2) {
       const sdnn = std(recentRrs, 'uncorrected')
       this.metricValue = sdnn
       this.metricSubject.next(this.metricValue)

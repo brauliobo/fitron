@@ -1,19 +1,20 @@
 <template>
   <div>
-    <p><b>RMSSD:</b> {{ value.toFixed(2) }} ms</p>
+    <p>
+      <b>RMSSD:</b>
+      {{ value.toFixed(2) }}ms - Mean: {{meanValue.toFixed(2)}}ms
+    </p>
   </div>
 </template>
 
 <script>
-import { opts } from '../services/store'
 import RmssdCalculator from '../services/RMSSDCalculator.js'
-import RRIntCalculatorMixin from '../mixins/RRIntCalculatorMixin.js'
+import MetricMixin from '../mixins/MetricMixin.js'
 
 export default {
-  mixins: [RRIntCalculatorMixin],
+  mixins: [MetricMixin],
   data() {
     return {
-      opts: opts,
       calculatorClass: RmssdCalculator
     }
   }

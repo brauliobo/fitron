@@ -1,20 +1,17 @@
 <template>
   <div>
-    <p><b>MxDMn:</b> {{ value.toFixed(2) }}ms</p>
+    <p><b>MxDMn:</b> {{ value.toFixed(2) }} ms - Mean: {{meanValue.toFixed(2)}}</p>
   </div>
 </template>
 
 <script>
-import { opts } from '../services/store'
 import MxdmnCalculator from '../services/MxDMnCalculator.js'
-import RRIntCalculatorMixin from '../mixins/RRIntCalculatorMixin.js'
+import MetricMixin from '../mixins/MetricMixin.js'
 
 export default {
-  name: 'MxdmnComponent',
-  mixins: [RRIntCalculatorMixin],
+  mixins: [MetricMixin],
   data() {
     return {
-      opts: opts,
       calculatorClass: MxdmnCalculator
     }
   }

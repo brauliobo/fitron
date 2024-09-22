@@ -1,27 +1,19 @@
-import { watch } from 'vue'
 import { Subject } from 'rxjs'
 
 export default class RRIntCalculator {
   constructor(device, opts, maxRRIntervals = 1000) {
     this.device = device
-    this.opts = opts // Reactive opts object
-    this.pulsesNumber = opts.rrIntervals // Number of intervals for calculation
-    this.maxRRIntervals = maxRRIntervals // Maximum number of RR intervals to store
+    this.opts = opts
+    this.pulsesNumber = opts.rrIntervals || 100
+    this.maxRRIntervals = maxRRIntervals
 
     this.subscription = null
-    this.data = [] // Array to store RR intervals
-    this.metricValue = 0 // Calculated metric value (SDNN or RMSSD)
+    this.data = []
+    this.metricValue = 0
 
-    this.metricSubject = new Subject() // RxJS Subject to emit metric values
+    this.metricSubject = new Subject()
 
     this.init()
-
-    // Watch for changes in opts.rrIntervals and update pulsesNumber accordingly
-    watch(
-      () => this.opts.rrIntervals,
-      (newVal) => this.updatePulsesNumber(newVal),
-      { immediate: true }
-    )
   }
 
   init() {
@@ -42,7 +34,6 @@ export default class RRIntCalculator {
   }
 
   validateRrInterval(rri) {
-    // Valid RR intervals are typically between 300 ms and 2000 ms
     return rri >= 300 && rri <= 2000
   }
 
@@ -53,15 +44,17 @@ export default class RRIntCalculator {
     }
   }
 
-  calculateMetric() {
-    // Abstract method to be implemented by subclasses
-    throw new Error('calculateMetric() must be implemented by subclass')
+  /**
+   * Provides the most recent R-R intervals based on pulsesNumber.
+   * Subclasses can access this.recentRrs directly.
+   */
+  get recentRrs() {
+    const n = Math.min(this.pulsesNumber, this.data.length)
+    return this.data.slice(-n)
   }
 
-  updatePulsesNumber(newPulsesNumber) {
-    const clampedNumber = Math.max(2, Math.min(newPulsesNumber, this.maxRRIntervals))
-    this.pulsesNumber = clampedNumber
-    this.calculateMetric()
+  calculateMetric() {
+    throw new Error('calculateMetric() must be implemented by subclass')
   }
 
   getMetricObservable() {

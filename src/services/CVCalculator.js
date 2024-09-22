@@ -7,22 +7,21 @@ export default class CvCalculator extends RRIntCalculator {
   }
 
   calculateMetric() {
-    if (this.data.length > 0) {
-      const meanRR = mean(this.data) // Calculate mean of R-R intervals
-      const stdDev = std(this.data, 'uncorrected') // Calculate standard deviation
+    const recentRrs = this.recentRrs
 
-      // Prevent division by zero
+    if (recentRrs.length > 0) {
+      const meanRR = mean(recentRrs)
+      const stdDev = std(recentRrs, 'uncorrected')
+
       if (meanRR === 0) {
         this.metricValue = 0
       } else {
-        const cv = (stdDev / meanRR) * 100 // Calculate CV as a percentage
+        const cv = (stdDev / meanRR) * 100
         this.metricValue = cv
       }
 
-      // Emit the calculated CV value
       this.metricSubject.next(this.metricValue)
     } else {
-      // Handle case with no data
       this.metricValue = 0
       this.metricSubject.next(this.metricValue)
     }

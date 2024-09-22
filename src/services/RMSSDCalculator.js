@@ -7,9 +7,8 @@ export default class RmssdCalculator extends RRIntCalculator {
   }
 
   calculateMetric() {
-    if (this.data.length >= 2) {
-      const n = Math.min(this.pulsesNumber, this.data.length)
-      const recentRrs = this.data.slice(-n)
+    const recentRrs = this.recentRrs
+    if (recentRrs.length >= 2) {
       const differences = recentRrs.slice(1).map((val, i) => val - recentRrs[i])
       const squaredDifferences = differences.map((diff) => diff * diff)
       const meanOfSquares = mean(squaredDifferences)

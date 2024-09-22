@@ -6,12 +6,9 @@ export default class MxdmnCalculator extends RRIntCalculator {
   }
 
   calculateMetric() {
-    if (this.data.length >= 2) {
-      const n = Math.min(this.pulsesNumber, this.data.length)
-      const recentRrs = this.data.slice(-n)
-      
-      // Placeholder Calculation Logic
-      // Example: Calculate the mean of absolute differences from the mean R-R interval
+    const recentRrs = this.recentRrs
+
+    if (recentRrs.length >= 2) {
       const sum = recentRrs.reduce((acc, val) => acc + val, 0)
       const mean = sum / recentRrs.length
       const deviations = recentRrs.map(rri => Math.abs(rri - mean))
