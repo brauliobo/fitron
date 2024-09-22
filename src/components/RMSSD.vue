@@ -27,7 +27,7 @@ export default {
         if (newDevice) {
           this.calculator = new RMSSDCalculator(newDevice, this.opts)
 
-          this.subscription = this.calculator.getRmssdObservable().subscribe(rmssd => this.value = rmssd)
+          this.subscription = this.calculator.getMetricObservable().subscribe(rmssd => this.value = rmssd)
         }
       },
     },

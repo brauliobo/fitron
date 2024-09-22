@@ -27,7 +27,7 @@ export default {
         if (newDevice) {
           this.calculator = new SDNNCalculator(newDevice, this.opts)
 
-          this.subscription = this.calculator.getSdnnObservable().subscribe(sddn => this.value = sddn)
+          this.subscription = this.calculator.getMetricObservable().subscribe(sddn => this.value = sddn)
         }
       },
     },
