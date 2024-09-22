@@ -6,43 +6,20 @@
 
 <script>
 import { opts } from '../services/store'
-import RMSSDCalculator from '../services/RMSSDCalculator.js'
+import RmssdCalculator from '../services/RMSSDCalculator.js'
+import RRIntCalculatorMixin from '../mixins/RRIntCalculatorMixin.js'
 
 export default {
+  mixins: [RRIntCalculatorMixin],
   data() {
     return {
-      calculator: null,
-      value: 0,
-      subscription: null,
       opts: opts,
-    };
-  },
-  props: ['device'],
-
-  watch: {
-    device: {
-      immediate: true,
-      handler(newDevice) {
-        this.reset()
-        if (newDevice) {
-          this.calculator = new RMSSDCalculator(newDevice, this.opts)
-
-          this.subscription = this.calculator.getMetricObservable().subscribe(rmssd => this.value = rmssd)
-        }
-      },
-    },
-  },
-
-  methods: {
-    reset() {
-      this.calculator   && (this.calculator.destroy(), this.calculator = null)
-      this.subscription && (this.subscription.unsubscribe(), this.subscription = null)
+      calculatorClass: RmssdCalculator
     }
-  },
-
-  beforeDestroy() {
-    this.reset()
-  },
-};
+  }
+}
 </script>
+
+<style scoped>
+</style>
 

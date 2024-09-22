@@ -1,12 +1,12 @@
 <template>
   <div>
-    <p><b>SDNN:</b> {{ value.toFixed(2) }} ms</p>
+    <p><b>pNN50:</b> {{ value.toFixed(2) }}%</p>
   </div>
 </template>
 
 <script>
 import { opts } from '../services/store'
-import SdnnCalculator from '../services/SDNNCalculator.js'
+import pNN50Calculator from '../services/pNN50Calculator.js'
 import RRIntCalculatorMixin from '../mixins/RRIntCalculatorMixin.js'
 
 export default {
@@ -14,7 +14,7 @@ export default {
   data() {
     return {
       opts: opts,
-      calculatorClass: SdnnCalculator
+      calculatorClass: pNN50Calculator
     }
   }
 }

@@ -12,6 +12,7 @@
 
     <SDNN v-if=device :device=device />
     <RMSSD v-if=device :device=device />
+    <pNN50 v-if=device :device=device />
 
     <Ecg v-if=device :device=device />
     <Accelerometer v-if=device :device=device />
