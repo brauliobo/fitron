@@ -1,12 +1,12 @@
 <template>
   <div>
-    <p><b>SDNN:</b> {{ value.toFixed(2) }} ms</p>
+    <p><b>RMSSD:</b> {{ value.toFixed(2) }} ms</p>
   </div>
 </template>
 
 <script>
 import { opts } from '../services/store'
-import SDNNCalculator from '../services/SDNNCalculator.js'
+import RMSSDCalculator from '../services/RMSSDCalculator.js'
 
 export default {
   data() {
@@ -25,9 +25,9 @@ export default {
       handler(newDevice) {
         this.reset()
         if (newDevice) {
-          this.calculator = new SDNNCalculator(newDevice, this.opts)
+          this.calculator = new RMSSDCalculator(newDevice, this.opts)
 
-          this.subscription = this.calculator.getSdnnObservable().subscribe(sddn => this.value = sddn)
+          this.subscription = this.calculator.getRmssdObservable().subscribe(rmssd => this.value = rmssd)
         }
       },
     },

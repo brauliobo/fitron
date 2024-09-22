@@ -9,7 +9,10 @@
     <Battery v-if=device :device=device />
     <HeartRateMonitor v-if=device :device=device />
     <RRInterval v-if=device :device=device />
+
     <SDNN v-if=device :device=device />
+    <RMSSD v-if=device :device=device />
+
     <Ecg v-if=device :device=device />
     <Accelerometer v-if=device :device=device />
 
@@ -18,15 +21,11 @@
 
 <script>
 import log from '@/log.js'
-import Battery from '../components/Battery.vue'
-import HeartRateMonitor from '../components/HeartRateMonitor.vue'
-import RRInterval from '../components/RRInterval.vue'
-import Ecg from '../components/Ecg.vue'
-import Accelerometer from '../components/Accelerometer.vue'
-import SDNN from '../components/SDNN.vue'
+
 import {PairService, ConnectService} from '../web_bluetooth.js'
 
 export default {
+
   data() {
     return {
       pairedDevice: null,
@@ -34,7 +33,6 @@ export default {
     }
   },
   name: 'WebApp',
-  components: { Battery, SDNN, HeartRateMonitor, RRInterval, Ecg, Accelerometer },
 
   async mounted() {
   },

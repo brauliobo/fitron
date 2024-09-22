@@ -1,17 +1,24 @@
 <template>
   <div>
-    <p v-if=rrInterval >R-R Interval: {{ Math.round(rrInterval) }}ms </p>
+    <p v-if=lastRRInterval >R-R Interval: {{ Math.round(lastRRInterval) }}ms </p>
     <p v-else >No R-R Interval available</p>
+    
+    <div>
+      <label for=rrIntervals > Number of R-R Intervals for metrics </label>
+      <input type=number name=rrIntervals v-model.number=opts.rrIntervals :min=2 :max=1000 />
+    </div>
   </div>
 </template>
 
 <script>
 import log from '@/log'
+import { opts } from '../services/store'
 
 export default {
   data() {
     return {
-      rrInterval: null
+      lastRRInterval: null,
+      opts: opts,
     }
   },
   props: ['device'],
@@ -20,7 +27,7 @@ export default {
     device: {
       immediate: true,
       handler() {
-        this.device.observeRRInterval().subscribe(rri => this.rrInterval = rri)
+        this.device.observeRRInterval().subscribe(rri => this.lastRRInterval = rri)
       }
     }
   },

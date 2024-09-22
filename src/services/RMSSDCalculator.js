@@ -1,25 +1,22 @@
-// src/services/SdnnCalculator.js
-
 import { watch } from 'vue'
 import { Subject } from 'rxjs'
-import { std } from 'mathjs'
+import { sqrt, mean } from 'mathjs'
 
-export default class SdnnCalculator {
+export default class RMSSDCalculator {
   constructor(device, opts, maxRRIntervals = 1000) {
     this.device = device
-    this.opts = opts // Reactive opts object
-    this.pulsesNumber = opts.rrIntervals // Number of intervals for SDNN calculation
+    this.opts = opts
+    this.pulsesNumber = opts.rrIntervals
     this.maxRRIntervals = maxRRIntervals
 
     this.subscription = null
-    this.data = [] // Renamed from rrIntervals to data
-    this.sdnnValue = 0
+    this.data = []
+    this.rmssdValue = 0
 
-    this.sdnnSubject = new Subject()
+    this.rmssdSubject = new Subject()
 
     this.init()
 
-    // Correctly invoke updatePulsesNumber with newVal
     watch(
       () => this.opts.rrIntervals,
       (newVal) => this.updatePulsesNumber(newVal),
@@ -32,17 +29,13 @@ export default class SdnnCalculator {
       this.subscription = this.device
         .observeRRInterval()
         .subscribe((rri) => this.handleRrInterval(rri))
-    } else {
-      console.error('Device does not support observeRRInterval().')
     }
   }
 
   handleRrInterval(rri) {
     if (this.validateRrInterval(rri)) {
       this.addRrInterval(rri)
-      this.calculateSdnn()
-    } else {
-      console.warn(`Discarded invalid R-R interval: ${rri} ms`)
+      this.calculateRmssd()
     }
   }
 
@@ -57,27 +50,29 @@ export default class SdnnCalculator {
     }
   }
 
-  calculateSdnn() {
+  calculateRmssd() {
     if (this.data.length >= 2) {
       const n = Math.min(this.pulsesNumber, this.data.length)
       const recentRrs = this.data.slice(-n)
-      const sdnn = std(recentRrs, 'uncorrected')
-      this.sdnnValue = sdnn
-      this.sdnnSubject.next(this.sdnnValue)
+      const differences = recentRrs.slice(1).map((val, i) => val - recentRrs[i])
+      const squaredDifferences = differences.map((diff) => diff * diff)
+      const meanOfSquares = mean(squaredDifferences)
+      this.rmssdValue = sqrt(meanOfSquares)
+      this.rmssdSubject.next(this.rmssdValue)
     } else {
-      this.sdnnValue = 0
-      this.sdnnSubject.next(this.sdnnValue)
+      this.rmssdValue = 0
+      this.rmssdSubject.next(this.rmssdValue)
     }
   }
 
   updatePulsesNumber(newPulsesNumber) {
     const clampedNumber = Math.max(2, Math.min(newPulsesNumber, this.maxRRIntervals))
     this.pulsesNumber = clampedNumber
-    this.calculateSdnn()
+    this.calculateRmssd()
   }
 
-  getSdnnObservable() {
-    return this.sdnnSubject.asObservable()
+  getRmssdObservable() {
+    return this.rmssdSubject.asObservable()
   }
 
   destroy() {
@@ -85,7 +80,7 @@ export default class SdnnCalculator {
       this.subscription.unsubscribe()
       this.subscription = null
     }
-    this.sdnnSubject.complete()
+    this.rmssdSubject.complete()
   }
 }
 
