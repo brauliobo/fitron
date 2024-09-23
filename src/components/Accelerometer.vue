@@ -5,8 +5,8 @@
 </template>
 
 <script>
-import Plotly from 'plotly.js-dist';
-import log from '@/log';
+import Plotly from 'plotly.js-dist-min'
+import log from '@/log'
 
 export default {
   data() {
